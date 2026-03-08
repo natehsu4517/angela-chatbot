@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useChatStore } from '../stores/chatStore'
 import { useChat } from '../hooks/useChat'
 import ChatBubble from './ChatBubble'
@@ -124,8 +124,25 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
   }
 
   // ── Floating mode: FAB + animated panel ──
+  const [fabMoved, setFabMoved] = useState(false)
+
+  const handleFabClick = () => {
+    if (!fabMoved) setFabMoved(true)
+    setOpen(!isOpen)
+  }
+
+  // FAB starts centered on screen, moves to bottom-right on first tap
+  const isCentered = !fabMoved && !isOpen
+
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    <div
+      className={`fixed z-50 flex flex-col items-end gap-3
+        transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+        ${isCentered
+          ? 'bottom-1/2 right-1/2 translate-x-1/2 translate-y-1/2'
+          : 'bottom-5 right-5 translate-x-0 translate-y-0'
+        }`}
+    >
       <AnimatePresence>
         {showPanel && (
           <motion.div
@@ -154,11 +171,11 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
           )}
 
           <motion.button
-            onClick={() => setOpen(!isOpen)}
+            onClick={handleFabClick}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             className="relative w-14 h-14 rounded-full bg-accent text-bg flex items-center justify-center
-              shadow-lg shadow-black/15 cursor-pointer hover:bg-accent-hover transition-colors"
+              shadow-lg shadow-black/15 cursor-pointer hover:bg-accent-hover transition-colors overflow-hidden"
           >
             <AnimatePresence mode="wait">
               {isOpen ? (
@@ -173,13 +190,13 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
                 </motion.div>
               ) : (
                 <motion.div
-                  key="chat"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
+                  key="avatar"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.5, opacity: 0 }}
                   transition={{ duration: 0.15 }}
                 >
-                  <MessageSquare size={22} />
+                  <AngelaAvatar size={40} />
                 </motion.div>
               )}
             </AnimatePresence>
