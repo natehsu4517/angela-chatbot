@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "Space Mono", "Consolas", monospace;
+
+  /* Light mode — matches portfolio */
+  --color-bg: #f2efe9;
+  --color-surface: #e8e4de;
+  --color-surface-hover: #ddd9d2;
+  --color-surface-elevated: #fff;
+  --color-border: #c8c4bc;
+  --color-border-light: #ddd9d2;
+  --color-text: #0a0a0a;
+  --color-text-secondary: #3a3a3a;
+  --color-text-muted: #999999;
+  --color-accent: #0a0a0a;
+  --color-accent-hover: #333;
+
+  /* Score colors */
+  --color-score-low: #dc2626;
+  --color-score-mid: #d97706;
+  --color-score-high: #16a34a;
+
+  /* Chat bubbles */
+  --color-agent-bubble: #e8e4de;
+  --color-user-bubble: #0a0a0a;
+
+  /* Success */
+  --color-success: #16a34a;
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
