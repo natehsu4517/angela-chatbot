@@ -47,7 +47,7 @@ const initialScore: LeadScore = {
 const GREETING_MESSAGE: Message = {
   id: 'greeting',
   role: 'agent',
-  content: "Hey! I'm Angela, Nate's assistant. I help match visitors with the right solutions based on what Nate's built before. What brings you here today?",
+  content: "Hey! I'm Angela, Nate's assistant. Let's see what kind of problem we can help you solve with your business!",
   timestamp: Date.now(),
   quickReplies: ['Data is a mess', 'Need a dashboard', 'Need leads', 'Need a website'],
 }

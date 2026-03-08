@@ -1,4 +1,4 @@
-import type { LeadProfile, LeadScore } from '../../src/utils/types'
+import type { LeadProfile, LeadScore } from '../../src/utils/types.js'
 
 const WEIGHTS = {
   budget: 30,

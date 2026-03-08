@@ -18,7 +18,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'POST') {
     const { leadProfile, score, conversation, status } = req.body || {}
 
-    const { data, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
       .from('leads')
       .insert({
         name: leadProfile?.name,
