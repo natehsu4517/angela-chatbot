@@ -1,11 +1,23 @@
+import { useId } from 'react'
 import { motion } from 'framer-motion'
+import type { AvatarExpression } from '../utils/types'
 
 interface AngelaAvatarProps {
   size?: number
   isTyping?: boolean
+  expression?: AvatarExpression
 }
 
-export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvatarProps) {
+export default function AngelaAvatar({ size = 36, isTyping = false, expression = 'neutral' }: AngelaAvatarProps) {
+  const uid = useId()
+  const id = (name: string) => `${name}-${uid}`
+
+  // Expression-driven values (dramatic enough to read at 36px)
+  const irisOffset = expression === 'thinking' ? { x: -2, y: -2 } : { x: 0, y: 0 }
+  const eyeSquint = expression === 'happy' ? 1.5 : 0 // flatten eye opening
+  const blushOpacity = expression === 'happy' ? 0.25 : expression === 'concerned' ? 0.05 : 0.12
+  const sparkleOpacity = expression === 'happy' ? 1 : 0.8
+
   return (
     <motion.svg
       width={size}
@@ -20,34 +32,34 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
       className="shrink-0"
     >
       <defs>
-        <clipPath id="avatar-clip">
+        <clipPath id={id('clip')}>
           <circle cx={50} cy={50} r={49} />
         </clipPath>
 
-        <linearGradient id="hair-main" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={id('hair')} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#0D0D12" />
           <stop offset="40%" stopColor="#080810" />
           <stop offset="60%" stopColor="#12121E" />
           <stop offset="100%" stopColor="#0A0A12" />
         </linearGradient>
 
-        <linearGradient id="hair-highlight" x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id={id('hl')} x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#3A4A6A" />
           <stop offset="100%" stopColor="#0D0D12" />
         </linearGradient>
 
-        <radialGradient id="skin" cx="50%" cy="38%" r="55%">
+        <radialGradient id={id('skin')} cx="50%" cy="38%" r="55%">
           <stop offset="0%" stopColor="#F8EDE8" />
           <stop offset="70%" stopColor="#F2E0D8" />
           <stop offset="100%" stopColor="#EBCFC4" />
         </radialGradient>
 
-        <linearGradient id="lip-pink" x1="0%" y1="0%" x2="0%" y2="100%">
+        <linearGradient id={id('lip')} x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor="#E8A0A0" />
           <stop offset="100%" stopColor="#D88888" />
         </linearGradient>
 
-        <filter id="sparkle" x="-50%" y="-50%" width="200%" height="200%">
+        <filter id={id('sparkle')} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="0.6" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -59,7 +71,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
       {/* Background */}
       <circle cx={50} cy={50} r={49} fill="#F0EBE6" stroke="#E0DCD8" strokeWidth={1.2} />
 
-      <g clipPath="url(#avatar-clip)">
+      <g clipPath={`url(#${id('clip')})`}>
 
         {/* ============ LAYER 1: HAIR BEHIND EVERYTHING ============ */}
 
@@ -73,7 +85,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
              Q86 40 82 18
              Q78 8 50 6
              Q22 8 18 18 Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
 
         {/* Hair inner volume — left side */}
@@ -84,7 +96,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
         {/* Blue sheen — left */}
         <motion.path
           d="M14 35 Q10 55 8 78 L13 78 Q15 55 17 38 Z"
-          fill="url(#hair-highlight)"
+          fill={`url(#${id('hl')})`}
           opacity={0.15}
           animate={{ opacity: [0.1, 0.2, 0.1] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
@@ -92,14 +104,14 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
         {/* Blue sheen — right */}
         <motion.path
           d="M86 35 Q90 55 92 78 L87 78 Q85 55 83 38 Z"
-          fill="url(#hair-highlight)"
+          fill={`url(#${id('hl')})`}
           opacity={0.12}
           animate={{ opacity: [0.08, 0.18, 0.08] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
 
         {/* Hair crown — voluminous top behind the face */}
-        <ellipse cx={50} cy={26} rx={32} ry={20} fill="url(#hair-main)" />
+        <ellipse cx={50} cy={26} rx={32} ry={20} fill={`url(#${id('hair')})`} />
 
         {/* ============ LAYER 2: BODY ============ */}
 
@@ -131,7 +143,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
              Q56 71 62 66
              Q67 63 70 56
              Q73 48 71 36 Z"
-          fill="url(#skin)"
+          fill={`url(#${id('skin')})`}
         />
 
         {/* Cheekbone shadow */}
@@ -141,16 +153,30 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
         {/* ============ LAYER 4: FACIAL FEATURES ============ */}
 
         {/* Eyebrows */}
-        <path
-          d="M33 41 Q37 38.5 42 40"
+        <motion.path
+          animate={{
+            d: expression === 'concerned'
+              ? 'M33 40 Q37 39 42 41.5'     // inner ends drop
+              : expression === 'happy'
+              ? 'M33 41.5 Q37 39 42 40.5'   // relaxed
+              : 'M33 41 Q37 38.5 42 40',     // neutral
+          }}
+          transition={{ duration: 0.3 }}
           stroke="#1A1520"
           strokeWidth={1.1}
           fill="none"
           strokeLinecap="round"
           opacity={0.6}
         />
-        <path
-          d="M58 40 Q63 38.5 67 41"
+        <motion.path
+          animate={{
+            d: expression === 'concerned'
+              ? 'M58 41.5 Q63 39 67 40'
+              : expression === 'happy'
+              ? 'M58 40.5 Q63 39 67 41.5'
+              : 'M58 40 Q63 38.5 67 41',
+          }}
+          transition={{ duration: 0.3 }}
           stroke="#1A1520"
           strokeWidth={1.1}
           fill="none"
@@ -160,25 +186,29 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
 
         {/* --- LEFT EYE --- */}
         <g>
-          <path d="M32 49 Q38 43.5 44 49 Q38 53.5 32 49" fill="white" />
+          <motion.path
+            animate={{ d: `M32 49 Q38 ${43.5 + eyeSquint} 44 49 Q38 ${53.5 - eyeSquint} 32 49` }}
+            transition={{ duration: 0.3 }}
+            fill="white"
+          />
           <path d="M33 48.5 Q38 44.5 43 48.5" fill="#E0D0CC" opacity={0.3} />
 
           <motion.circle
-            cx={38} cy={49} r={4} fill="#1A1520"
+            cx={38 + irisOffset.x} cy={49 + irisOffset.y} r={4} fill="#1A1520"
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '38px 49px' }}
+            style={{ transformOrigin: `${38 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
           <motion.circle
-            cx={38} cy={49} r={4} fill="none" stroke="#2A2030" strokeWidth={0.8}
+            cx={38 + irisOffset.x} cy={49 + irisOffset.y} r={4} fill="none" stroke="#2A2030" strokeWidth={0.8}
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '38px 49px' }}
+            style={{ transformOrigin: `${38 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
           <motion.circle
-            cx={38} cy={48.5} r={2} fill="#000"
+            cx={38 + irisOffset.x} cy={48.5 + irisOffset.y} r={2} fill="#000"
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '38px 49px' }}
+            style={{ transformOrigin: `${38 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
 
@@ -194,8 +224,8 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
 
           {/* Sparkles */}
           <motion.circle
-            cx={40} cy={47} r={1.5} fill="white" filter="url(#sparkle)"
-            animate={{ opacity: [0.8, 1, 0.8] }}
+            cx={40} cy={47} r={1.5} fill="white" filter={`url(#${id('sparkle')})`}
+            animate={{ opacity: [sparkleOpacity - 0.1, sparkleOpacity, sparkleOpacity - 0.1] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
           <circle cx={36} cy={50.5} r={0.7} fill="white" opacity={0.5} />
@@ -203,25 +233,29 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
 
         {/* --- RIGHT EYE --- */}
         <g>
-          <path d="M56 49 Q62 43.5 68 49 Q62 53.5 56 49" fill="white" />
+          <motion.path
+            animate={{ d: `M56 49 Q62 ${43.5 + eyeSquint} 68 49 Q62 ${53.5 - eyeSquint} 56 49` }}
+            transition={{ duration: 0.3 }}
+            fill="white"
+          />
           <path d="M57 48.5 Q62 44.5 67 48.5" fill="#E0D0CC" opacity={0.3} />
 
           <motion.circle
-            cx={62} cy={49} r={4} fill="#1A1520"
+            cx={62 + irisOffset.x} cy={49 + irisOffset.y} r={4} fill="#1A1520"
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '62px 49px' }}
+            style={{ transformOrigin: `${62 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
           <motion.circle
-            cx={62} cy={49} r={4} fill="none" stroke="#2A2030" strokeWidth={0.8}
+            cx={62 + irisOffset.x} cy={49 + irisOffset.y} r={4} fill="none" stroke="#2A2030" strokeWidth={0.8}
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '62px 49px' }}
+            style={{ transformOrigin: `${62 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
           <motion.circle
-            cx={62} cy={48.5} r={2} fill="#000"
+            cx={62 + irisOffset.x} cy={48.5 + irisOffset.y} r={2} fill="#000"
             animate={{ scaleY: [1, 1, 0.05, 1, 1] }}
-            style={{ transformOrigin: '62px 49px' }}
+            style={{ transformOrigin: `${62 + irisOffset.x}px ${49 + irisOffset.y}px` }}
             transition={{ duration: 4, repeat: Infinity, times: [0, 0.42, 0.44, 0.46, 1] }}
           />
 
@@ -237,8 +271,8 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
 
           {/* Sparkles */}
           <motion.circle
-            cx={64} cy={47} r={1.5} fill="white" filter="url(#sparkle)"
-            animate={{ opacity: [0.8, 1, 0.8] }}
+            cx={64} cy={47} r={1.5} fill="white" filter={`url(#${id('sparkle')})`}
+            animate={{ opacity: [sparkleOpacity - 0.1, sparkleOpacity, sparkleOpacity - 0.1] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
           />
           <circle cx={60} cy={50.5} r={0.7} fill="white" opacity={0.5} />
@@ -258,7 +292,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
         {isTyping ? (
           <motion.ellipse
             cx={50} cy={62} rx={3} ry={2}
-            fill="url(#lip-pink)"
+            fill={`url(#${id('lip')})`}
             animate={{ ry: [2, 3, 1.2, 2.5, 2], rx: [3, 2.5, 3.5, 2.5, 3] }}
             transition={{ duration: 0.8, repeat: Infinity, ease: 'easeInOut' }}
           />
@@ -268,7 +302,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
               d="M46 61.5 Q47.5 60.5 49 61.2 Q49.5 60.8 50 61 Q50.5 60.8 51 61.2 Q52.5 60.5 54 61.5"
               fill="#D89898"
             />
-            <path d="M46 61.5 Q50 64 54 61.5" fill="url(#lip-pink)" />
+            <path d="M46 61.5 Q50 64 54 61.5" fill={`url(#${id('lip')})`} />
             <motion.ellipse
               cx={50} cy={62.2} rx={1.5} ry={0.5} fill="white" opacity={0.12}
               animate={{ opacity: [0.08, 0.18, 0.08] }}
@@ -279,13 +313,13 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
 
         {/* Blush */}
         <motion.ellipse
-          cx={32} cy={55} rx={5} ry={3} fill="#F0B0B0" opacity={0.12}
-          animate={{ opacity: [0.08, 0.16, 0.08] }}
+          cx={32} cy={55} rx={5} ry={3} fill="#F0B0B0"
+          animate={{ opacity: [blushOpacity - 0.04, blushOpacity + 0.04, blushOpacity - 0.04] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.ellipse
-          cx={68} cy={55} rx={5} ry={3} fill="#F0B0B0" opacity={0.12}
-          animate={{ opacity: [0.08, 0.16, 0.08] }}
+          cx={68} cy={55} rx={5} ry={3} fill="#F0B0B0"
+          animate={{ opacity: [blushOpacity - 0.04, blushOpacity + 0.04, blushOpacity - 0.04] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
 
@@ -308,7 +342,7 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
              Q34 33 30 34
              Q26 35.5 23 32
              Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
 
         {/* Strand separation lines in bangs */}
@@ -333,25 +367,25 @@ export default function AngelaAvatar({ size = 36, isTyping = false }: AngelaAvat
         <path
           d="M23 32 Q19 50 16 70 Q14 80 13 85
              L20 85 Q22 75 24 65 Q26 50 27 35 Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
         <path
           d="M77 32 Q81 50 84 70 Q86 80 87 85
              L80 85 Q78 75 76 65 Q74 50 73 35 Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
 
         {/* Hair falling forward — left side over shoulder */}
         <path
           d="M24 55 Q28 70 32 82 Q33 88 35 92
              L30 92 Q27 85 24 72 Q22 62 22 55 Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
         {/* Hair falling forward — right side over shoulder */}
         <path
           d="M76 55 Q72 70 68 82 Q67 88 65 92
              L70 92 Q73 85 76 72 Q78 62 78 55 Z"
-          fill="url(#hair-main)"
+          fill={`url(#${id('hair')})`}
         />
 
         {/* Hair shine streaks */}

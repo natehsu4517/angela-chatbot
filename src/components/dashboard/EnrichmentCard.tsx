@@ -27,6 +27,14 @@ export default function EnrichmentCard() {
   const [revealedFields, setRevealedFields] = useState<number>(0)
   const hasTriggered = useRef(false)
 
+  // Reset hasTriggered when conversation is reset (company goes back to null)
+  useEffect(() => {
+    if (!leadProfile.company) {
+      hasTriggered.current = false
+      setRevealedFields(0)
+    }
+  }, [leadProfile.company])
+
   // Trigger enrichment on company name
   useEffect(() => {
     if (leadProfile.company && !hasTriggered.current) {

@@ -1,5 +1,6 @@
 import ChatWidget from './components/ChatWidget'
 import DemoDashboard from './components/DemoDashboard'
+import DifferentiatorSection from './components/DifferentiatorSection'
 import { Bot, ExternalLink } from 'lucide-react'
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
             </div>
           </div>
           <a
-            href="https://github.com/yourusername/lead-agent"
+            href="https://github.com/natehsu/lead-agent"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-sm text-text-muted hover:text-text transition-colors"
@@ -32,56 +33,25 @@ export default function App() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-2 gap-16 items-start">
-          {/* Left: description */}
-          <div>
-            <p className="text-sm text-text-secondary font-semibold uppercase tracking-wider mb-4">
-              Portfolio Demo
+      <main className="max-w-6xl mx-auto px-6 py-10">
+        {/* Hero headline */}
+        <div className="mb-10">
+          <h2 className="text-4xl md:text-5xl font-bold font-sans leading-[1.1] mb-3">
+            Meet Angela
+          </h2>
+          <p className="text-lg text-text-muted max-w-xl">
+            An AI agent that qualifies your leads, scores them in real-time, and books meetings on your calendar. Try her out.
+          </p>
+        </div>
+
+        {/* Demo: chat + dashboard side by side */}
+        <div className="grid md:grid-cols-2 gap-10 items-start">
+          {/* Left: Angela (sticky so it stays visible while scrolling dashboard) */}
+          <div className="md:sticky md:top-6">
+            <p className="text-sm text-text-secondary font-semibold uppercase tracking-wider mb-3">
+              Try it live
             </p>
-            <h2 className="text-4xl md:text-5xl font-bold font-sans leading-[1.1] mb-6">
-              AI-Powered Lead Qualification
-            </h2>
-            <p className="text-lg text-text-muted leading-relaxed mb-10">
-              An intelligent chat agent that qualifies website visitors in real-time,
-              scores leads based on budget, timeline, and fit, then books meetings
-              for qualified prospects directly on your calendar.
-            </p>
-
-            <div className="space-y-4 mb-10">
-              {[
-                'Natural conversation powered by Claude AI',
-                'Real-time lead scoring (0-100)',
-                'Google Calendar integration with auto-booking',
-                'Embeddable on any website via single script tag',
-                'Supabase backend for lead storage',
-              ].map((feature) => (
-                <div key={feature} className="flex items-start gap-3">
-                  <span className="w-1.5 h-1.5 rounded-full bg-text mt-2.5 shrink-0" />
-                  <span className="text-base text-text-secondary">{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-2 mb-12">
-              {['React', 'TypeScript', 'Claude API', 'Supabase', 'Google Calendar', 'Framer Motion'].map(
-                (tech) => (
-                  <span
-                    key={tech}
-                    className="text-xs px-3 py-1.5 rounded-full
-                      bg-surface border border-border text-text-muted
-                      font-mono uppercase tracking-wider"
-                  >
-                    {tech}
-                  </span>
-                )
-              )}
-            </div>
-
-            {/* Inline chat widget — desktop only */}
-            <div className="hidden md:block">
-              <ChatWidget inline />
-            </div>
+            <ChatWidget inline />
           </div>
 
           {/* Right: live dashboard */}
@@ -90,8 +60,64 @@ export default function App() {
           </div>
         </div>
 
+        {/* What Makes Angela Different */}
+        <DifferentiatorSection />
+
+        {/* Features below the fold */}
+        <section className="mt-16 border-t border-border pt-12">
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold font-sans leading-[1.1] mb-4">
+                AI-Powered Lead Qualification
+              </h2>
+              <p className="text-base text-text-muted leading-relaxed">
+                An intelligent chat agent that qualifies website visitors in real-time,
+                scores leads based on budget, timeline, and fit, then books meetings
+                for qualified prospects directly on your calendar.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                'Human-like typing cadence with variable pauses after punctuation',
+                'Voice input via Web Speech API with live transcription',
+                'Animated SVG avatar with 4 expression states driven by sentiment',
+                'Return visitor recognition, remembers your name across sessions',
+                'Interactive qualification UI: visual budget, timeline, and pain point selectors',
+                'Proactive exit intent detection and idle nudges',
+                'Real-time sentiment tracking with mood visualization',
+                'Confetti celebration on successful meeting booking',
+                'Multilingual auto-detect, responds in the visitor\'s language',
+                'Page-aware context when embedded on a portfolio',
+                'Conversation memory with 24-hour TTL and real-time lead scoring',
+                'Google Calendar integration with automatic Meet links',
+              ].map((feature) => (
+                <div key={feature} className="flex items-start gap-2.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-text mt-2 shrink-0" />
+                  <span className="text-sm text-text-secondary">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-10">
+            {['React', 'TypeScript', 'Claude API', 'Supabase', 'Google Calendar', 'Framer Motion'].map(
+              (tech) => (
+                <span
+                  key={tech}
+                  className="text-xs px-3 py-1.5 rounded-full
+                    bg-surface border border-border text-text-muted
+                    font-mono uppercase tracking-wider"
+                >
+                  {tech}
+                </span>
+              )
+            )}
+          </div>
+        </section>
+
         {/* How to embed */}
-        <section className="mt-24 border-t border-border pt-14">
+        <section className="mt-16 border-t border-border pt-12">
           <h3 className="text-xl font-bold font-sans mb-5">Embed on Your Site</h3>
           <p className="text-base text-text-muted mb-5">
             Add this single line to any webpage to install the lead qualification agent:
@@ -102,10 +128,6 @@ export default function App() {
         </section>
       </main>
 
-      {/* Floating chat widget — mobile only */}
-      <div className="md:hidden">
-        <ChatWidget />
-      </div>
     </div>
   )
 }

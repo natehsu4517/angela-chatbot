@@ -11,14 +11,14 @@ export default function QuickReplies({ options, onSelect, context }: QuickReplie
     <motion.div
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.15 }}
+      transition={{ duration: 0.15 }}
       className="pl-10"
     >
       {context && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ duration: 0.1 }}
           className="text-[11px] text-text-muted italic mb-1.5"
         >
           {context}

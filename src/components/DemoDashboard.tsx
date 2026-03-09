@@ -1,15 +1,17 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useChatStore } from '../stores/chatStore'
-import { User, Building2, DollarSign, Clock, Target, Zap } from 'lucide-react'
+import { User, Building2, DollarSign, Clock, Target, Zap, LayoutDashboard } from 'lucide-react'
 import JourneyPipeline from './dashboard/JourneyPipeline'
 import RadarChart from './dashboard/RadarChart'
 import SentimentGraph from './dashboard/SentimentGraph'
 import EnrichmentCard from './dashboard/EnrichmentCard'
 import ConversationSummary from './dashboard/ConversationSummary'
-import ComparisonCard from './dashboard/ComparisonCard'
+import AdminPanel from './admin/AdminPanel'
 
 export default function DemoDashboard() {
   const { leadProfile, score, stage, messages, sentimentHistory } = useChatStore()
+  const [adminOpen, setAdminOpen] = useState(false)
 
   const fields = [
     { icon: User, label: 'Name', value: leadProfile.name },
@@ -87,8 +89,18 @@ export default function DemoDashboard() {
       {/* Conversation Summary (only when booked) */}
       <ConversationSummary />
 
-      {/* ROI Comparison */}
-      <ComparisonCard />
+      {/* Open Admin Panel */}
+      <button
+        onClick={() => setAdminOpen(true)}
+        className="w-full flex items-center justify-center gap-2 bg-text text-bg
+          rounded-xl py-3 font-semibold text-sm font-sans
+          hover:opacity-90 active:scale-[0.98] transition-all"
+      >
+        <LayoutDashboard size={16} />
+        Open Admin Panel
+      </button>
+
+      <AdminPanel isOpen={adminOpen} onClose={() => setAdminOpen(false)} />
     </div>
   )
 }

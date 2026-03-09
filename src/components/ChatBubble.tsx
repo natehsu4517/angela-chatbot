@@ -1,17 +1,24 @@
 import { motion } from 'framer-motion'
 import { User, Sparkles } from 'lucide-react'
 import AngelaAvatar from './AngelaAvatar'
+import SummaryCard from './SummaryCard'
 
 interface ChatBubbleProps {
   role: 'agent' | 'user'
   content: string
-  messageType?: 'text' | 'insight'
+  messageType?: 'text' | 'insight' | 'summary-card'
+  isStreaming?: boolean
 }
 
-export default function ChatBubble({ role, content, messageType }: ChatBubbleProps) {
+export default function ChatBubble({ role, content, messageType, isStreaming }: ChatBubbleProps) {
   const isAgent = role === 'agent'
 
-  // Insight card — special full-width rendering
+  // Summary card
+  if (messageType === 'summary-card') {
+    return <SummaryCard />
+  }
+
+  // Insight card
   if (messageType === 'insight') {
     const lines = content.split('\n').filter(Boolean)
     return (
@@ -30,7 +37,7 @@ export default function ChatBubble({ role, content, messageType }: ChatBubblePro
           </div>
           <div className="text-[14px] leading-relaxed text-text space-y-1">
             {lines.map((line, i) => {
-              if (line.startsWith('•')) {
+              if (line.startsWith('•') || line.startsWith('*')) {
                 return (
                   <motion.p
                     key={i}
@@ -68,14 +75,19 @@ export default function ChatBubble({ role, content, messageType }: ChatBubblePro
         </div>
       )}
 
-      <div
-        className={`max-w-[80%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed ${
-          isAgent
-            ? 'bg-surface-elevated text-text border border-border-light rounded-bl-md'
-            : 'bg-user-bubble text-bg rounded-br-md'
-        }`}
-      >
-        {content}
+      <div className={`max-w-[80%] space-y-2 ${!isAgent ? 'flex flex-col items-end' : ''}`}>
+        <div
+          className={`px-4 py-3 rounded-2xl text-[15px] leading-relaxed ${
+            isAgent
+              ? 'bg-surface-elevated text-text border border-border-light rounded-bl-md'
+              : 'bg-user-bubble text-bg rounded-br-md'
+          }`}
+        >
+          <span {...(isStreaming ? { id: 'angela-stream-target' } : {})}>{content}</span>
+          {isStreaming && (
+            <span className="inline-block w-0.5 h-4 bg-text/60 ml-0.5 align-text-bottom animate-pulse" />
+          )}
+        </div>
       </div>
 
       {!isAgent && (

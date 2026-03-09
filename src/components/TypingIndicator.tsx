@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion'
 import AngelaAvatar from './AngelaAvatar'
+import { useChatStore } from '../stores/chatStore'
 
 export default function TypingIndicator() {
+  const { expression } = useChatStore()
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -10,7 +13,7 @@ export default function TypingIndicator() {
       className="flex gap-2.5 justify-start items-end"
     >
       <div className="shrink-0">
-        <AngelaAvatar size={36} isTyping />
+        <AngelaAvatar size={36} isTyping expression={expression} />
       </div>
       <motion.div
         className="flex gap-1 items-center px-3 py-2"

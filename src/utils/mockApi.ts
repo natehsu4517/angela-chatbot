@@ -1,4 +1,4 @@
-import type { ChatResponse, TimeSlot, BookingResult, Message, LeadProfile } from './types'
+import type { ChatResponse, StreamMetadata, TimeSlot, BookingResult, Message, LeadProfile } from './types'
 
 // ─── Collected Data Tracker ─────────────────────────────────────────────────
 
@@ -184,11 +184,20 @@ const QUESTIONS: QuestionTemplate[] = [
     sentiment: 0.5,
   },
   {
+    field: 'name',
+    message: "By the way, what's your name? I like to know who I'm chatting with.",
+    quickReplies: [],
+    quickReplyContext: '',
+    openerPool: 'empathize',
+    scoreBreakdown: { budget: 0, timeline: 0, companySize: 0, painPoints: 35 },
+    sentiment: 0.4,
+  },
+  {
     field: 'company',
     message: "what's your company name? I want to make sure I'm giving you relevant suggestions.",
     quickReplies: [],
     quickReplyContext: '',
-    openerPool: 'empathize',
+    openerPool: 'neutral',
     scoreBreakdown: { budget: 0, timeline: 0, companySize: 0, painPoints: 35 },
     sentiment: 0.3,
   },
@@ -218,15 +227,6 @@ const QUESTIONS: QuestionTemplate[] = [
     openerPool: 'bridge',
     scoreBreakdown: { budget: 70, timeline: 0, companySize: 65, painPoints: 35 },
     sentiment: 0.5,
-  },
-  {
-    field: 'name',
-    message: "Almost done! What's your name and best email to reach you?",
-    quickReplies: [],
-    quickReplyContext: '',
-    openerPool: 'acknowledge',
-    scoreBreakdown: { budget: 70, timeline: 85, companySize: 65, painPoints: 35 },
-    sentiment: 0.6,
   },
 ]
 
@@ -429,7 +429,7 @@ export async function mockSendMessage(
   }
 
   // ── Step 7: Find next question to ask ──
-  const fieldOrder: (keyof CollectedData)[] = ['painPoints', 'company', 'companySize', 'budget', 'timeline', 'name']
+  const fieldOrder: (keyof CollectedData)[] = ['painPoints', 'name', 'company', 'companySize', 'budget', 'timeline']
   let nextQuestion: QuestionTemplate | null = null
 
   for (const field of fieldOrder) {
@@ -508,4 +508,59 @@ export async function mockBookMeeting(
     eventTime: `${startTime} ET`,
     eventDate: date,
   }
+}
+
+// ─── Mock Streaming ─────────────────────────────────────────────────────────
+
+export function mockSendMessageStream(
+  messages: Pick<Message, 'role' | 'content'>[],
+  userMessage: string,
+  onToken: (text: string) => void,
+  onDone: (metadata: StreamMetadata) => void,
+  _onError: (error: Error) => void
+): AbortController {
+  const controller = new AbortController()
+  let cancelled = false
+  const timeouts: ReturnType<typeof setTimeout>[] = []
+
+  controller.signal.addEventListener('abort', () => {
+    cancelled = true
+    timeouts.forEach(clearTimeout)
+  })
+
+  // Get the full mock response, then simulate streaming
+  mockSendMessage(messages, userMessage).then((response) => {
+    if (cancelled) return
+
+    const words = response.message.split(/(\s+)/) // preserve whitespace
+    let delay = 300 // initial delay before first token
+
+    for (const word of words) {
+      const t = setTimeout(() => {
+        if (cancelled) return
+        onToken(word)
+      }, delay)
+      timeouts.push(t)
+      delay += 2 + Math.random() * 5 // 2-7ms per word (token buffer handles pacing)
+    }
+
+    // Send metadata after all tokens
+    const doneTimeout = setTimeout(() => {
+      if (cancelled) return
+      onDone({
+        quickReplies: response.quickReplies || [],
+        quickReplyContext: response.quickReplyContext,
+        leadData: response.leadData,
+        shouldBook: response.shouldBook,
+        sentiment: response.sentiment,
+        insightSummary: response.insightCard,
+        score: response.score,
+        stage: response.stage,
+        progress: response.progress || { current: 0, total: 6 },
+      })
+    }, delay + 100)
+    timeouts.push(doneTimeout)
+  })
+
+  return controller
 }

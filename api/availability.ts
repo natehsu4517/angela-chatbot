@@ -105,9 +105,9 @@ function etToUTC(date: string, hour: number, minute: number): string {
 }
 
 function getETOffset(date: Date): number {
-  const utcStr = date.toLocaleString('en-US', { timeZone: 'UTC', hour12: false })
-  const etStr = date.toLocaleString('en-US', { timeZone: TZ, hour12: false })
-  const utcHour = parseInt(utcStr.split(', ')[1].split(':')[0])
-  const etHour = parseInt(etStr.split(', ')[1].split(':')[0])
+  const utcParts = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', hour: 'numeric', hour12: false }).formatToParts(date)
+  const etParts = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: false }).formatToParts(date)
+  const utcHour = parseInt(utcParts.find((p) => p.type === 'hour')?.value || '0')
+  const etHour = parseInt(etParts.find((p) => p.type === 'hour')?.value || '0')
   return utcHour - etHour
 }

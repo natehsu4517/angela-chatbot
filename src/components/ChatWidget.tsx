@@ -1,8 +1,9 @@
 import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, RotateCcw } from 'lucide-react'
 import { useChatStore } from '../stores/chatStore'
 import { useChat } from '../hooks/useChat'
+import { useProactiveTriggers } from '../hooks/useProactiveTriggers'
 import ChatBubble from './ChatBubble'
 import ChatInput from './ChatInput'
 import QuickReplies from './QuickReplies'
@@ -10,20 +11,58 @@ import TypingIndicator from './TypingIndicator'
 import LeadScoreBadge from './LeadScoreBadge'
 import BookingStep from './BookingStep'
 import AngelaAvatar from './AngelaAvatar'
+import BudgetSelector from './qualification/BudgetSelector'
+import TimelineSelector from './qualification/TimelineSelector'
+import PainPointSelector from './qualification/PainPointSelector'
+import TeamSizeSelector from './qualification/TeamSizeSelector'
+import type { PageContext } from '../utils/types'
 
 interface ChatWidgetProps {
   inline?: boolean
+  pageContext?: PageContext
 }
 
-export default function ChatWidget({ inline = false }: ChatWidgetProps) {
-  const { messages, isOpen, isTyping, score, stage, qualificationProgress, setOpen } = useChatStore()
-  const { send } = useChat()
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
+
+function QualificationUI({ options, context, onSelect }: { options: string[]; context?: string; onSelect: (v: string) => void }) {
+  const ctx = (context || '').toLowerCase()
+
+  if (ctx.includes('budget')) return <BudgetSelector onSelect={onSelect} />
+  if (ctx.includes('timeline')) return <TimelineSelector onSelect={onSelect} />
+  if (ctx.includes('challenge') || ctx.includes('pain')) return <PainPointSelector onSelect={onSelect} />
+  if (ctx.includes('team') || ctx.includes('size')) return <TeamSizeSelector onSelect={onSelect} />
+
+  return <QuickReplies options={options} onSelect={onSelect} context={context} />
+}
+
+export default function ChatWidget({ inline = false, pageContext }: ChatWidgetProps) {
+  const { messages, isOpen, isTyping, score, stage, expression, qualificationProgress, conversationStartTime, setOpen, reset } = useChatStore()
+  const { send } = useChat({ pageContext })
   const scrollRef = useRef<HTMLDivElement>(null)
   const lastMessage = messages[messages.length - 1]
 
   const progressPct = qualificationProgress.total > 0
     ? (qualificationProgress.current / qualificationProgress.total) * 100
     : 0
+
+  const showPanel = inline || isOpen
+
+  const { resetTriggers } = useProactiveTriggers({
+    enabled: true,
+    chatIsOpen: showPanel,
+  })
+
+  const handleReset = () => {
+    reset()
+    resetTriggers()
+  }
+
+  // TTL check: reset if conversation is older than 24 hours
+  useEffect(() => {
+    if (conversationStartTime && Date.now() - conversationStartTime > TWENTY_FOUR_HOURS) {
+      handleReset()
+    }
+  }, [conversationStartTime])
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -32,9 +71,7 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
     }
   }, [messages, isTyping])
 
-  const showPanel = inline || isOpen
-
-  // ── Shared chat panel ──
+  // Shared chat panel
   const chatPanel = (
     <div
       className={`bg-surface-elevated border border-border rounded-2xl
@@ -48,7 +85,7 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
       <div className="border-b border-border">
         <div className="flex items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3">
-            <AngelaAvatar size={40} isTyping={isTyping} />
+            <AngelaAvatar size={40} isTyping={isTyping} expression={expression} />
             <div>
               <p className="text-base font-semibold font-sans">Angela</p>
               <div className="flex items-center gap-1.5">
@@ -64,12 +101,23 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {score.total > 0 && <LeadScoreBadge score={score.total} />}
+            {messages.length > 1 && (
+              <button
+                onClick={handleReset}
+                className="p-1.5 rounded-lg hover:bg-surface transition-colors cursor-pointer"
+                title="New conversation"
+                aria-label="Reset conversation"
+              >
+                <RotateCcw size={14} className="text-text-muted" />
+              </button>
+            )}
             {!inline && (
               <button
                 onClick={() => setOpen(false)}
                 className="p-1.5 rounded-lg hover:bg-surface transition-colors cursor-pointer"
+                aria-label="Close chat"
               >
                 <X size={18} className="text-text-muted" />
               </button>
@@ -79,7 +127,7 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
 
         {/* Progress bar */}
         {qualificationProgress.current > 0 && (
-          <div className="h-0.5 bg-border">
+          <div className="h-0.5 bg-border" role="progressbar" aria-valuenow={qualificationProgress.current} aria-valuemin={0} aria-valuemax={qualificationProgress.total} aria-label="Qualification progress">
             <motion.div
               className="h-full bg-text"
               initial={{ width: 0 }}
@@ -91,14 +139,20 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-label="Chat messages" aria-live="polite">
         {messages.map((msg) => (
           <div key={msg.id} className="space-y-2">
-            <ChatBubble role={msg.role} content={msg.content} messageType={msg.messageType} />
+            <ChatBubble
+              role={msg.role}
+              content={msg.content}
+              messageType={msg.messageType}
+              isStreaming={msg.isStreaming}
+            />
             {msg.quickReplies &&
               msg.id === lastMessage?.id &&
-              !isTyping && (
-                <QuickReplies options={msg.quickReplies} onSelect={send} context={msg.quickReplyContext} />
+              !isTyping &&
+              !msg.isStreaming && (
+                <QualificationUI options={msg.quickReplies} context={msg.quickReplyContext} onSelect={send} />
               )}
           </div>
         ))}
@@ -118,12 +172,12 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
     </div>
   )
 
-  // ── Inline mode: just the panel, no FAB ──
+  // Inline mode: just the panel
   if (inline) {
     return chatPanel
   }
 
-  // ── Floating mode: FAB + animated panel ──
+  // Floating mode: FAB + animated panel
   const [fabMoved, setFabMoved] = useState(false)
 
   const handleFabClick = () => {
@@ -131,7 +185,6 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
     setOpen(!isOpen)
   }
 
-  // FAB starts centered on screen, moves to bottom-right on first tap
   const isCentered = !fabMoved && !isOpen
 
   return (
@@ -174,6 +227,7 @@ export default function ChatWidget({ inline = false }: ChatWidgetProps) {
             onClick={handleFabClick}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            aria-label={isOpen ? 'Close chat' : 'Open chat with Angela'}
             className="relative w-14 h-14 rounded-full bg-accent text-bg flex items-center justify-center
               shadow-lg shadow-black/15 cursor-pointer hover:bg-accent-hover transition-colors overflow-hidden"
           >

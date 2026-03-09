@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
+import confetti from 'canvas-confetti'
 import { getAvailability, bookMeeting } from '../utils/api'
 import { useChatStore } from '../stores/chatStore'
 import type { TimeSlot, BookingResult } from '../utils/types'
@@ -14,7 +15,15 @@ export default function BookingStep() {
   const [slots, setSlots] = useState<TimeSlot[]>([])
   const [loading, setLoading] = useState(false)
   const [booking, setBooking] = useState<BookingResult | null>(null)
+  const [bookingError, setBookingError] = useState<string | null>(null)
   const { leadProfile, setStage } = useChatStore()
+
+  const tzAbbr = new Date().toLocaleTimeString('en-US', { timeZoneName: 'short' }).split(' ').pop() || 'ET'
+
+  const formatSelectedDate = (dateStr: string) =>
+    new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+      weekday: 'long', month: 'long', day: 'numeric',
+    })
 
   // Generate next 14 weekdays
   const dates = Array.from({ length: 14 }, (_, i) => {
@@ -46,6 +55,7 @@ export default function BookingStep() {
   const handleBook = async () => {
     if (!selectedSlot || !leadProfile.name || !leadProfile.email) return
     setLoading(true)
+    setBookingError(null)
     try {
       const result = await bookMeeting(
         selectedDate,
@@ -57,8 +67,17 @@ export default function BookingStep() {
       setBooking(result)
       setPhase('success')
       setStage('booked')
+      setTimeout(() => {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#16a34a', '#0a0a0a', '#d97706', '#ffffff'],
+          disableForReducedMotion: true,
+        })
+      }, 200)
     } catch {
-      // Handle error
+      setBookingError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -124,12 +143,13 @@ export default function BookingStep() {
               <button
                 onClick={() => setPhase('date')}
                 className="p-1 hover:bg-surface-hover rounded cursor-pointer"
+                aria-label="Back to date selection"
               >
                 <ArrowLeft size={14} className="text-text-muted" />
               </button>
               <Clock size={14} className="text-accent" />
               <span className="text-xs font-medium text-text-muted">
-                {selectedDate} — Pick a time
+                {formatSelectedDate(selectedDate)} — Pick a time
               </span>
             </div>
             {loading ? (
@@ -171,6 +191,7 @@ export default function BookingStep() {
               <button
                 onClick={() => setPhase('time')}
                 className="p-1 hover:bg-surface-hover rounded cursor-pointer"
+                aria-label="Back to time selection"
               >
                 <ArrowLeft size={14} className="text-text-muted" />
               </button>
@@ -179,11 +200,11 @@ export default function BookingStep() {
             <div className="space-y-2 mb-4">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar size={14} className="text-accent" />
-                <span>{selectedDate}</span>
+                <span>{formatSelectedDate(selectedDate)}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock size={14} className="text-accent" />
-                <span>{formatTime(selectedSlot.start)} ET</span>
+                <span>{formatTime(selectedSlot.start)} {tzAbbr}</span>
               </div>
             </div>
             <button
@@ -199,6 +220,9 @@ export default function BookingStep() {
                 'Confirm Meeting'
               )}
             </button>
+            {bookingError && (
+              <p className="text-xs text-score-low text-center mt-2">{bookingError}</p>
+            )}
           </motion.div>
         )}
 
@@ -215,11 +239,14 @@ export default function BookingStep() {
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
             >
-              <CheckCircle2 size={40} className="text-success mx-auto mb-3" />
+              <CheckCircle2 size={40} className="text-success mx-auto mb-3 drop-shadow-[0_0_8px_rgba(22,163,74,0.4)]" />
             </motion.div>
             <p className="text-sm font-medium mb-1">Meeting Booked!</p>
-            <p className="text-xs text-text-muted mb-3">
+            <p className="text-xs text-text-muted mb-1">
               {booking.eventDate} at {booking.eventTime}
+            </p>
+            <p className="text-[11px] text-text-muted/70 mb-3">
+              Check your email{leadProfile.email ? ` (${leadProfile.email})` : ''} for the calendar invite.
             </p>
             {booking.meetLink && (
               <a
