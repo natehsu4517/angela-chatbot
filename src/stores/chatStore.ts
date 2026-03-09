@@ -52,9 +52,9 @@ const initialScore: LeadScore = {
 const DEFAULT_GREETING: Message = {
   id: 'greeting',
   role: 'agent',
-  content: "Hey! I'm Angela, Nate's assistant. Let's see what kind of problem we can help you solve with your business!",
+  content: "Hey! I'm Angela, an AI lead agent Nate built from scratch. I qualify visitors, score them in real-time, and book meetings. Try me out, I work just like I would on a real client's site.",
   timestamp: Date.now(),
-  quickReplies: ['Data is a mess', 'Need a dashboard', 'Need leads', 'Need a website'],
+  quickReplies: ['Show me what you can do', 'How does this work?', 'I want to hire Nate'],
 }
 
 function buildReturnGreeting(leadProfile: LeadProfile, stage: ConversationStage): Message {

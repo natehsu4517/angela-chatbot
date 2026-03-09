@@ -4,12 +4,20 @@ import { mockSendMessage, mockSendMessageStream, mockGetAvailability, mockBookMe
 const BASE = import.meta.env.VITE_API_URL || ''
 const USE_MOCK = import.meta.env.DEV && !import.meta.env.VITE_API_URL
 
+// Session-level fallback: if real API fails, use mock for the rest of the session.
+// Protects the portfolio demo during traffic spikes / API key issues.
+let fallbackToMock = false
+
+function shouldUseMock(): boolean {
+  return USE_MOCK || fallbackToMock
+}
+
 export async function sendMessage(
   messages: Pick<Message, 'role' | 'content'>[],
   userMessage: string,
   pageContext?: PageContext
 ): Promise<ChatResponse> {
-  if (USE_MOCK) return mockSendMessage(messages, userMessage)
+  if (shouldUseMock()) return mockSendMessage(messages, userMessage)
 
   const res = await fetch(`${BASE}/api/chat`, {
     method: 'POST',
@@ -28,7 +36,7 @@ export function sendMessageStream(
   onError: (error: Error) => void,
   pageContext?: PageContext
 ): AbortController {
-  if (USE_MOCK) return mockSendMessageStream(messages, userMessage, onToken, onDone, onError)
+  if (shouldUseMock()) return mockSendMessageStream(messages, userMessage, onToken, onDone, onError)
 
   const controller = new AbortController()
 
@@ -52,9 +60,8 @@ export function sendMessageStream(
 
         sseBuffer += decoder.decode(value, { stream: true })
 
-        // Parse SSE events from the buffer
         const lines = sseBuffer.split('\n')
-        sseBuffer = lines.pop() || '' // Keep the last incomplete line
+        sseBuffer = lines.pop() || ''
 
         let eventType = ''
         for (const line of lines) {
@@ -80,21 +87,32 @@ export function sendMessageStream(
       }
     })
     .catch((err) => {
-      if (err.name !== 'AbortError') {
-        onError(err)
-      }
+      if (err.name === 'AbortError') return
+
+      // Flip to mock for the rest of this session, then retry transparently
+      console.warn('[Angela] API failed, falling back to demo mode:', err.message)
+      fallbackToMock = true
+
+      const mockController = mockSendMessageStream(messages, userMessage, onToken, onDone, onError)
+      // Wire original abort signal to mock stream
+      controller.signal.addEventListener('abort', () => mockController.abort())
     })
 
   return controller
 }
 
 export async function getAvailability(date: string): Promise<TimeSlot[]> {
-  if (USE_MOCK) return mockGetAvailability(date)
+  if (shouldUseMock()) return mockGetAvailability(date)
 
-  const res = await fetch(`${BASE}/api/availability?date=${date}`)
-  if (!res.ok) throw new Error('Availability request failed')
-  const data = await res.json()
-  return data.slots
+  try {
+    const res = await fetch(`${BASE}/api/availability?date=${date}`)
+    if (!res.ok) throw new Error('Availability request failed')
+    const data = await res.json()
+    return data.slots
+  } catch {
+    fallbackToMock = true
+    return mockGetAvailability(date)
+  }
 }
 
 export async function bookMeeting(
@@ -104,13 +122,18 @@ export async function bookMeeting(
   email: string,
   leadData?: Record<string, unknown>
 ): Promise<BookingResult> {
-  if (USE_MOCK) return mockBookMeeting(date, startTime, name, email)
+  if (shouldUseMock()) return mockBookMeeting(date, startTime, name, email)
 
-  const res = await fetch(`${BASE}/api/book`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ date, startTime, name, email, leadData }),
-  })
-  if (!res.ok) throw new Error('Booking request failed')
-  return res.json()
+  try {
+    const res = await fetch(`${BASE}/api/book`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date, startTime, name, email, leadData }),
+    })
+    if (!res.ok) throw new Error('Booking request failed')
+    return res.json()
+  } catch {
+    fallbackToMock = true
+    return mockBookMeeting(date, startTime, name, email)
+  }
 }

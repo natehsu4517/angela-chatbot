@@ -4,33 +4,33 @@ import { Keyboard, SmilePlus, LayoutGrid, Radar, Server } from 'lucide-react'
 const differentiators = [
   {
     icon: Keyboard,
-    title: 'Human-Like Typing',
+    title: 'Visitors Stay Longer',
     description:
-      'Variable-speed streaming with natural pauses after punctuation and paragraphs. No robotic instant text dumps.',
+      "Natural typing speed with realistic pauses. Visitors engage like they're texting a real person, not waiting on a chatbot.",
   },
   {
     icon: SmilePlus,
-    title: 'Expressive Avatar',
+    title: 'Conversations Feel Human',
     description:
-      'Four sentiment-driven expression states that shift based on conversation mood, not a static bot icon.',
+      "Angela's expression shifts based on conversation mood. Visitors sense empathy, not a static bot icon.",
   },
   {
     icon: LayoutGrid,
-    title: 'Interactive Qualification',
+    title: 'Qualification Without Friction',
     description:
-      'Visual budget sliders, timeline selectors, and pain point pickers replace generic text chips.',
+      'Visual budget sliders and timeline pickers replace boring form fields. Visitors actually enjoy the process.',
   },
   {
     icon: Radar,
-    title: 'Proactive Intelligence',
+    title: 'No Lead Slips Through',
     description:
-      'Exit intent detection and idle nudges that feel like a real person paying attention, not canned popups.',
+      'Exit intent detection and idle nudges re-engage visitors who are about to leave. Feels attentive, not pushy.',
   },
   {
     icon: Server,
-    title: 'Self-Hosted',
+    title: 'You Own It Completely',
     description:
-      'One script tag. No monthly SaaS fee. No vendor lock-in. Deploy on your own infrastructure.',
+      'One script tag. No monthly SaaS fee. No vendor lock-in. Runs on your own infrastructure.',
   },
 ]
 
@@ -39,10 +39,10 @@ export default function DifferentiatorSection() {
     <section className="mt-16 border-t border-border pt-12">
       <div className="mb-10">
         <h2 className="text-3xl md:text-4xl font-bold font-sans leading-[1.1] mb-3">
-          What Makes Angela Different
+          Why Angela Converts Better
         </h2>
         <p className="text-base text-text-muted">
-          Features enterprise chatbots charge $2,500/mo for. Built from scratch.
+          The details that turn a chatbot into a closer.
         </p>
       </div>
 
