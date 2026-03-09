@@ -34,6 +34,7 @@ export default function App() {
           <p className="text-lg md:text-xl text-text-muted max-w-xl mb-8">
             Angela talks to your website visitors, qualifies them in real-time,
             and books meetings on your calendar. No forms. No friction.
+            No $2,500/mo SaaS subscription.
           </p>
           <motion.div
             className="flex items-center gap-2 text-sm text-text-muted"
@@ -74,14 +75,15 @@ export default function App() {
           <div className="grid md:grid-cols-2 gap-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold font-sans leading-[1.1] mb-4">
-                Everything You Need to
+                The Full Pipeline,
                 <br />
-                Convert Visitors into Meetings
+                Not Just a Chat Widget
               </h2>
               <p className="text-base text-text-muted leading-relaxed">
-                Angela handles the entire qualification flow: from first hello to
-                calendar booking. She learns what your visitors need, scores them
-                against your criteria, and only books calls with qualified leads.
+                Most chatbots collect a name and email, then hand off to a human.
+                Angela handles qualification end-to-end: scores leads in real-time,
+                adapts her approach based on sentiment, and books meetings with
+                qualified prospects directly on your calendar.
               </p>
             </div>
 

@@ -1,18 +1,24 @@
 import { motion } from 'framer-motion'
-import { Keyboard, SmilePlus, LayoutGrid, Radar, Server } from 'lucide-react'
+import { Keyboard, SmilePlus, LayoutGrid, Radar, Eye, DollarSign } from 'lucide-react'
 
 const differentiators = [
+  {
+    icon: DollarSign,
+    title: '$0/mo, You Own It',
+    description:
+      'Drift charges $2,500/mo. Intercom charges per resolution. Angela is a one-time build on your own infrastructure. No subscriptions, no vendor lock-in.',
+  },
+  {
+    icon: Eye,
+    title: 'Watch It Think in Real-Time',
+    description:
+      'Most chatbots give you a report after the fact. Angela shows lead scoring, sentiment, and data extraction live as the conversation happens.',
+  },
   {
     icon: Keyboard,
     title: 'Visitors Stay Longer',
     description:
       "Natural typing speed with realistic pauses. Visitors engage like they're texting a real person, not waiting on a chatbot.",
-  },
-  {
-    icon: SmilePlus,
-    title: 'Conversations Feel Human',
-    description:
-      "Angela's expression shifts based on conversation mood. Visitors sense empathy, not a static bot icon.",
   },
   {
     icon: LayoutGrid,
@@ -21,16 +27,16 @@ const differentiators = [
       'Visual budget sliders and timeline pickers replace boring form fields. Visitors actually enjoy the process.',
   },
   {
+    icon: SmilePlus,
+    title: 'Conversations Feel Human',
+    description:
+      "Angela's expression shifts based on conversation mood. Visitors sense empathy, not a static bot icon.",
+  },
+  {
     icon: Radar,
     title: 'No Lead Slips Through',
     description:
       'Exit intent detection and idle nudges re-engage visitors who are about to leave. Feels attentive, not pushy.',
-  },
-  {
-    icon: Server,
-    title: 'You Own It Completely',
-    description:
-      'One script tag. No monthly SaaS fee. No vendor lock-in. Runs on your own infrastructure.',
   },
 ]
 
@@ -42,7 +48,7 @@ export default function DifferentiatorSection() {
           Why Angela Converts Better
         </h2>
         <p className="text-base text-text-muted">
-          The details that turn a chatbot into a closer.
+          What $2,500/mo chatbots won't tell you they're missing.
         </p>
       </div>
 
