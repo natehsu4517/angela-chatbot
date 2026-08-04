@@ -2,8 +2,18 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import Anthropic from '@anthropic-ai/sdk'
 import { SYSTEM_PROMPT } from './_lib/prompts.js'
 import { calculateScore } from './_lib/scoring.js'
+import {
+  checkOrigin,
+  handlePreflight,
+  rateLimit,
+  sanitizeString,
+  setSecurityHeaders,
+} from './_lib/security.js'
 
 export const maxDuration = 30
+
+const MAX_MESSAGE_LENGTH = 2000
+const MAX_CONVERSATION_MESSAGES = 30
 
 const client = new Anthropic()
 
@@ -21,6 +31,11 @@ function countFilledFields(leadData: Record<string, unknown>): number {
 type ParseState = 'BEFORE_MESSAGE' | 'IN_MESSAGE' | 'AFTER_MESSAGE' | 'IN_METADATA' | 'DONE'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setSecurityHeaders(res)
+  if (handlePreflight(req, res)) return
+  if (!checkOrigin(req, res)) return
+  if (!rateLimit(req, res, { maxRequests: 15, windowMs: 60_000 })) return
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -31,13 +46,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'userMessage is required' })
   }
 
-  // Build system prompt with optional page context
+  if (userMessage.length > MAX_MESSAGE_LENGTH) {
+    return res.status(400).json({ error: `Message must be under ${MAX_MESSAGE_LENGTH} characters` })
+  }
+
+  // Build system prompt with sanitized page context
   let systemPrompt = SYSTEM_PROMPT
   if (pageContext && typeof pageContext === 'object') {
     const parts: string[] = []
-    if (pageContext.url) parts.push(`URL: ${pageContext.url}`)
-    if (pageContext.section) parts.push(`Section: "${pageContext.section}"`)
-    if (pageContext.projectViewing) parts.push(`Viewing project: "${pageContext.projectViewing}"`)
+    const url = sanitizeString(pageContext.url, 200)
+    const section = sanitizeString(pageContext.section, 100)
+    const project = sanitizeString(pageContext.projectViewing, 100)
+    if (url) parts.push(`URL: ${url}`)
+    if (section) parts.push(`Section: "${section}"`)
+    if (project) parts.push(`Viewing project: "${project}"`)
     if (parts.length > 0) {
       systemPrompt += `\n\n## Current Page Context\nThe visitor is on: ${parts.join('. ')}.\nReference this naturally if relevant, but don't force it.`
     }
@@ -50,12 +72,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('X-Accel-Buffering', 'no')
 
   try {
-    const conversationMessages: Anthropic.MessageParam[] = (messages || []).map(
-      (m: { role: string; content: string }) => ({
+    const conversationMessages: Anthropic.MessageParam[] = (messages || [])
+      .slice(-MAX_CONVERSATION_MESSAGES)
+      .map((m: { role: string; content: string }) => ({
         role: m.role === 'agent' ? 'assistant' : 'user',
-        content: m.content,
-      })
-    )
+        content: typeof m.content === 'string' ? m.content.slice(0, MAX_MESSAGE_LENGTH) : '',
+      }))
     conversationMessages.push({ role: 'user', content: userMessage })
 
     const stream = client.messages.stream({

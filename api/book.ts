@@ -1,6 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getCalendar, getCalendarId } from './_lib/google.js'
 import { randomUUID } from 'crypto'
+import {
+  checkOrigin,
+  handlePreflight,
+  rateLimit,
+  sanitizeString,
+  sanitizeEmail,
+  setSecurityHeaders,
+} from './_lib/security.js'
 
 const TZ = 'America/New_York'
 const BIZ_START = 9
@@ -8,6 +16,11 @@ const BIZ_END = 17
 const SLOT_MINUTES = 30
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setSecurityHeaders(res)
+  if (handlePreflight(req, res)) return
+  if (!checkOrigin(req, res)) return
+  if (!rateLimit(req, res, { maxRequests: 10, windowMs: 60_000 })) return
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -20,10 +33,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!startTime || !/^\d{2}:\d{2}$/.test(startTime)) {
     return res.status(400).json({ error: 'Invalid time' })
   }
-  if (!name || typeof name !== 'string' || name.trim().length < 1) {
+
+  const safeName = sanitizeString(name, 100)
+  if (!safeName) {
     return res.status(400).json({ error: 'Name is required' })
   }
-  if (!email || typeof email !== 'string' || !email.includes('@')) {
+
+  const safeEmail = sanitizeEmail(email)
+  if (!safeEmail) {
     return res.status(400).json({ error: 'Valid email is required' })
   }
 
@@ -67,25 +84,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(409).json({ error: 'This slot is no longer available' })
     }
 
-    // Build description with lead data
-    let description = `Discovery call booked via AI Lead Agent.\n\nName: ${name.trim()}\nEmail: ${email.trim()}`
+    // Build description with sanitized lead data
+    let description = `Discovery call booked via AI Lead Agent.\n\nName: ${safeName}\nEmail: ${safeEmail}`
     if (leadData) {
-      if (leadData.company) description += `\nCompany: ${leadData.company}`
-      if (leadData.budget) description += `\nBudget: ${leadData.budget}`
-      if (leadData.timeline) description += `\nTimeline: ${leadData.timeline}`
-      if (leadData.companySize) description += `\nCompany Size: ${leadData.companySize}`
-      if (leadData.painPoints?.length) description += `\nPain Points: ${leadData.painPoints.join(', ')}`
+      const company = sanitizeString(leadData.company, 100)
+      const budget = sanitizeString(leadData.budget, 50)
+      const timeline = sanitizeString(leadData.timeline, 50)
+      const companySize = sanitizeString(leadData.companySize, 50)
+      const painPoints = Array.isArray(leadData.painPoints)
+        ? leadData.painPoints.slice(0, 10).map((p: unknown) => sanitizeString(p, 100)).filter(Boolean)
+        : []
+      if (company) description += `\nCompany: ${company}`
+      if (budget) description += `\nBudget: ${budget}`
+      if (timeline) description += `\nTimeline: ${timeline}`
+      if (companySize) description += `\nCompany Size: ${companySize}`
+      if (painPoints.length) description += `\nPain Points: ${painPoints.join(', ')}`
     }
 
     const event = await calendar.events.insert({
       calendarId,
       conferenceDataVersion: 1,
       requestBody: {
-        summary: `Discovery Call — ${name.trim()}`,
+        summary: `Discovery Call - ${safeName}`,
         description,
         start: { dateTime: startDateTime, timeZone: TZ },
         end: { dateTime: endDateTime, timeZone: TZ },
-        attendees: [{ email: email.trim() }],
+        attendees: [{ email: safeEmail }],
         conferenceData: {
           createRequest: {
             requestId: randomUUID(),

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Angela - Cover Image</title>
+<style>
+  * { margin: 0; padding: 0; }
+  body {
+    background: #f2efe9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+  }
+  .cover {
+    width: 1200px;
+    height: 628px;
+    background: #f2efe9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .portrait {
+    width: 500px;
+    height: 500px;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="cover">
+  <!-- Subtle grid pattern background -->
+  <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:0.04" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <circle cx="20" cy="20" r="1" fill="#0a0a0a"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)"/>
+  </svg>
+
+  <div class="portrait">
+    <svg viewBox="0 0 500 500" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Hair gradient with richer tones -->
+        <linearGradient id="hair" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#0D0D14"/>
+          <stop offset="25%" stop-color="#080812"/>
+          <stop offset="50%" stop-color="#10101C"/>
+          <stop offset="75%" stop-color="#0C0C16"/>
+          <stop offset="100%" stop-color="#0A0A12"/>
+        </linearGradient>
+
+        <!-- Hair highlight (cool blue sheen) -->
+        <linearGradient id="hl" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#4A6090"/>
+          <stop offset="100%" stop-color="#0D0D14"/>
+        </linearGradient>
+
+        <!-- Skin with warm subsurface scattering feel -->
+        <radialGradient id="skin" cx="50%" cy="36%" r="55%">
+          <stop offset="0%" stop-color="#FAF0EC"/>
+          <stop offset="40%" stop-color="#F6E4DC"/>
+          <stop offset="75%" stop-color="#F0D8CE"/>
+          <stop offset="100%" stop-color="#E8C8BC"/>
+        </radialGradient>
+
+        <!-- Lip gradient -->
+        <linearGradient id="lip" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#E8A0A0"/>
+          <stop offset="50%" stop-color="#D89090"/>
+          <stop offset="100%" stop-color="#C88080"/>
+        </linearGradient>
+
+        <!-- Lip gloss highlight -->
+        <radialGradient id="lipGloss" cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="white" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="white" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Eye iris gradient -->
+        <radialGradient id="irisL" cx="45%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#2A2538"/>
+          <stop offset="60%" stop-color="#1A1520"/>
+          <stop offset="100%" stop-color="#0A0A10"/>
+        </radialGradient>
+        <radialGradient id="irisR" cx="55%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#2A2538"/>
+          <stop offset="60%" stop-color="#1A1520"/>
+          <stop offset="100%" stop-color="#0A0A10"/>
+        </radialGradient>
+
+        <!-- Nose shadow -->
+        <linearGradient id="noseShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#E4C8BC" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#E4C8BC" stop-opacity="0.4"/>
+        </linearGradient>
+
+        <!-- Clothing fabric gradient -->
+        <linearGradient id="top" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#1A1A22"/>
+          <stop offset="100%" stop-color="#12121A"/>
+        </linearGradient>
+
+        <!-- Sparkle filter -->
+        <filter id="sparkle" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Soft glow for blush -->
+        <filter id="blushFilter" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6"/>
+        </filter>
+
+        <!-- Background circle gradient -->
+        <radialGradient id="bgCircle" cx="50%" cy="45%" r="50%">
+          <stop offset="0%" stop-color="#F8F5F0"/>
+          <stop offset="100%" stop-color="#EBE7E0"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Background circle -->
+      <circle cx="250" cy="250" r="245" fill="url(#bgCircle)" stroke="#E0DCD6" stroke-width="2"/>
+
+      <clipPath id="clip">
+        <circle cx="250" cy="250" r="244"/>
+      </clipPath>
+
+      <g clip-path="url(#clip)">
+
+        <!-- ======== LAYER 1: HAIR BEHIND EVERYTHING ======== -->
+
+        <!-- Full hair silhouette, wide and voluminous -->
+        <path d="M90 90
+                 Q70 200 40 350
+                 Q20 440 25 500
+                 L475 500
+                 Q480 440 460 350
+                 Q430 200 410 90
+                 Q390 40 250 30
+                 Q110 40 90 90 Z"
+              fill="url(#hair)"/>
+
+        <!-- Hair volume shading - left -->
+        <path d="M100 110 Q80 250 50 410 L90 410 Q110 250 120 140 Z" fill="#0E0E18" opacity="0.5"/>
+        <!-- Hair volume shading - right -->
+        <path d="M400 110 Q420 250 450 410 L410 410 Q390 250 380 140 Z" fill="#0E0E18" opacity="0.5"/>
+
+        <!-- Soft blue sheen - left -->
+        <path d="M70 175 Q50 275 40 390 L65 390 Q75 275 85 190 Z"
+              fill="url(#hl)" opacity="0.15"/>
+        <!-- Soft blue sheen - right -->
+        <path d="M430 175 Q450 275 460 390 L435 390 Q425 275 415 190 Z"
+              fill="url(#hl)" opacity="0.12"/>
+
+        <!-- Hair strand texture - back -->
+        <path d="M80 120 Q72 220 55 360" stroke="#16162A" stroke-width="0.8" fill="none" opacity="0.2"/>
+        <path d="M100 100 Q88 210 70 370" stroke="#16162A" stroke-width="0.6" fill="none" opacity="0.15"/>
+        <path d="M400 100 Q412 210 430 370" stroke="#16162A" stroke-width="0.6" fill="none" opacity="0.15"/>
+        <path d="M420 120 Q428 220 445 360" stroke="#16162A" stroke-width="0.8" fill="none" opacity="0.2"/>
+
+        <!-- Hair crown behind face -->
+        <ellipse cx="250" cy="130" rx="160" ry="100" fill="url(#hair)"/>
+
+        <!-- ======== LAYER 2: NECK + BODY ======== -->
+
+        <!-- Neck -->
+        <path d="M210 340 Q210 390 205 440 L295 440 Q290 390 290 340" fill="#F0DDD4"/>
+
+        <!-- Neck shading / collarbone hint -->
+        <path d="M210 340 Q250 350 290 340 Q280 360 250 365 Q220 360 210 340"
+              fill="#E4C8BC" opacity="0.35"/>
+
+        <!-- Collarbones -->
+        <path d="M180 410 Q215 395 250 400" stroke="#E0C4B8" stroke-width="1" fill="none" opacity="0.3"/>
+        <path d="M320 410 Q285 395 250 400" stroke="#E0C4B8" stroke-width="1" fill="none" opacity="0.3"/>
+
+        <!-- Black top / clothing -->
+        <path d="M150 425 Q175 400 210 390 Q230 410 250 415 Q270 410 290 390 Q325 400 350 425
+                 L360 500 L140 500 Z"
+              fill="url(#top)"/>
+
+        <!-- Clothing detail - subtle fold lines -->
+        <path d="M210 390 Q230 410 250 415" stroke="#28283A" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <path d="M290 390 Q270 410 250 415" stroke="#28283A" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <path d="M180 430 Q200 445 230 455" stroke="#22222E" stroke-width="0.6" fill="none" opacity="0.2"/>
+        <path d="M320 430 Q300 445 270 455" stroke="#22222E" stroke-width="0.6" fill="none" opacity="0.2"/>
+
+        <!-- ======== LAYER 3: FACE ======== -->
+
+        <path d="M145 180
+                 Q135 240 150 280
+                 Q165 315 190 330
+                 Q220 355 250 360
+                 Q280 355 310 330
+                 Q335 315 350 280
+                 Q365 240 355 180 Z"
+              fill="url(#skin)"/>
+
+        <!-- Face shading - jawline -->
+        <path d="M150 280 Q165 315 190 330 Q220 355 250 360 Q280 355 310 330 Q335 315 350 280
+                 Q340 290 310 315 Q280 340 250 345 Q220 340 190 315 Q160 290 150 280 Z"
+              fill="#E4C8BC" opacity="0.2"/>
+
+        <!-- Cheekbone highlights -->
+        <ellipse cx="175" cy="265" rx="20" ry="10" fill="white" opacity="0.06"/>
+        <ellipse cx="325" cy="265" rx="20" ry="10" fill="white" opacity="0.06"/>
+
+        <!-- Cheekbone shadows -->
+        <ellipse cx="165" cy="280" rx="18" ry="12" fill="#E4C8BC" opacity="0.15"/>
+        <ellipse cx="335" cy="280" rx="18" ry="12" fill="#E4C8BC" opacity="0.15"/>
+
+        <!-- ======== LAYER 4: EYES ======== -->
+
+        <!-- Eyebrows - thicker and more defined -->
+        <path d="M165 200 Q180 192 200 196 Q208 198 212 202"
+              stroke="#1A1520" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+        <path d="M165 200 Q180 193 200 197"
+              stroke="#1A1520" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.3"/>
+
+        <path d="M288 202 Q292 198 300 196 Q320 192 335 200"
+              stroke="#1A1520" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.5"/>
+        <path d="M300 197 Q320 193 335 200"
+              stroke="#1A1520" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.3"/>
+
+        <!-- LEFT EYE -->
+        <g>
+          <!-- Eye white -->
+          <path d="M160 245 Q190 218 220 245 Q190 267 160 245" fill="white"/>
+
+          <!-- Upper eyelid shadow -->
+          <path d="M162 243 Q190 222 218 243" fill="#E8D4CC" opacity="0.3"/>
+
+          <!-- Iris -->
+          <circle cx="190" cy="245" r="20" fill="url(#irisL)"/>
+          <!-- Iris ring detail -->
+          <circle cx="190" cy="245" r="20" fill="none" stroke="#2A2535" stroke-width="1.5"/>
+          <!-- Iris texture lines -->
+          <path d="M182 238 L186 242" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M192 236 L191 241" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M198 239 L195 243" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M183 248 L186 246" stroke="#3A3548" stroke-width="0.5" opacity="0.2"/>
+          <path d="M196 248 L194 246" stroke="#3A3548" stroke-width="0.5" opacity="0.2"/>
+
+          <!-- Pupil -->
+          <circle cx="190" cy="244" r="10" fill="#050508"/>
+
+          <!-- Eye sparkle highlights -->
+          <circle cx="198" cy="237" r="5" fill="white" filter="url(#sparkle)" opacity="0.9"/>
+          <circle cx="184" cy="250" r="2.5" fill="white" opacity="0.5"/>
+          <circle cx="195" cy="248" r="1.2" fill="white" opacity="0.3"/>
+
+          <!-- Upper lash line - thick -->
+          <path d="M161 244 Q175 222 190 220 Q205 222 220 244"
+                stroke="#0A0A10" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+          <!-- Individual lashes - left eye -->
+          <path d="M162 243 L155 232" stroke="#0A0A10" stroke-width="2" stroke-linecap="round"/>
+          <path d="M166 237 L160 226" stroke="#0A0A10" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M172 231 L168 220" stroke="#0A0A10" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M178 226 L176 216" stroke="#0A0A10" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M184 223 L183 213" stroke="#0A0A10" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M190 221 L190 212" stroke="#0A0A10" stroke-width="1.3" stroke-linecap="round"/>
+
+          <!-- Lower lash line -->
+          <path d="M167 249 Q190 265 213 249" stroke="#2A2030" stroke-width="1" fill="none" opacity="0.3"/>
+
+          <!-- Lower lashes (subtle) -->
+          <path d="M172 254 L170 258" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+          <path d="M185 258 L184 262" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+          <path d="M198 256 L199 260" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+        </g>
+
+        <!-- RIGHT EYE -->
+        <g>
+          <path d="M280 245 Q310 218 340 245 Q310 267 280 245" fill="white"/>
+          <path d="M282 243 Q310 222 338 243" fill="#E8D4CC" opacity="0.3"/>
+
+          <circle cx="310" cy="245" r="20" fill="url(#irisR)"/>
+          <circle cx="310" cy="245" r="20" fill="none" stroke="#2A2535" stroke-width="1.5"/>
+          <path d="M302 238 L306 242" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M312 236 L311 241" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M318 239 L315 243" stroke="#3A3548" stroke-width="0.5" opacity="0.3"/>
+          <path d="M303 248 L306 246" stroke="#3A3548" stroke-width="0.5" opacity="0.2"/>
+          <path d="M316 248 L314 246" stroke="#3A3548" stroke-width="0.5" opacity="0.2"/>
+
+          <circle cx="310" cy="244" r="10" fill="#050508"/>
+
+          <circle cx="318" cy="237" r="5" fill="white" filter="url(#sparkle)" opacity="0.9"/>
+          <circle cx="304" cy="250" r="2.5" fill="white" opacity="0.5"/>
+          <circle cx="315" cy="248" r="1.2" fill="white" opacity="0.3"/>
+
+          <path d="M280 244 Q295 222 310 220 Q325 222 340 244"
+                stroke="#0A0A10" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+          <path d="M338 243 L345 232" stroke="#0A0A10" stroke-width="2" stroke-linecap="round"/>
+          <path d="M334 237 L340 226" stroke="#0A0A10" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M328 231 L332 220" stroke="#0A0A10" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M322 226 L324 216" stroke="#0A0A10" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M316 223 L317 213" stroke="#0A0A10" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M310 221 L310 212" stroke="#0A0A10" stroke-width="1.3" stroke-linecap="round"/>
+
+          <path d="M287 249 Q310 265 333 249" stroke="#2A2030" stroke-width="1" fill="none" opacity="0.3"/>
+          <path d="M302 254 L300 258" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+          <path d="M315 258 L314 262" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+          <path d="M325 256 L327 260" stroke="#1A1520" stroke-width="0.8" stroke-linecap="round" opacity="0.3"/>
+        </g>
+
+        <!-- ======== NOSE ======== -->
+        <path d="M248 270 Q245 282 244 290 Q247 294 250 295 Q253 294 256 290 Q255 282 252 270"
+              fill="url(#noseShadow)"/>
+        <path d="M244 290 Q247 294 250 295 Q253 294 256 290"
+              stroke="#D8BEB4" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Nose tip highlight -->
+        <ellipse cx="250" cy="290" rx="3" ry="2" fill="white" opacity="0.08"/>
+
+        <!-- ======== LIPS ======== -->
+        <g>
+          <!-- Upper lip -->
+          <path d="M228 308 Q236 303 244 307 Q247 305 250 306 Q253 305 256 307 Q264 303 272 308"
+                fill="#D89898"/>
+          <!-- Cupid's bow detail -->
+          <path d="M244 307 Q247 304 250 305 Q253 304 256 307"
+                stroke="#C08080" stroke-width="0.8" fill="none"/>
+          <!-- Lower lip -->
+          <path d="M228 308 Q250 325 272 308" fill="url(#lip)"/>
+          <!-- Lip line -->
+          <path d="M228 308 Q250 312 272 308" stroke="#C88888" stroke-width="0.6" fill="none"/>
+          <!-- Lip gloss -->
+          <ellipse cx="250" cy="314" rx="10" ry="5" fill="url(#lipGloss)"/>
+          <!-- Lower lip highlight -->
+          <ellipse cx="250" cy="316" rx="8" ry="3" fill="white" opacity="0.08"/>
+        </g>
+
+        <!-- ======== BLUSH ======== -->
+        <ellipse cx="160" cy="275" rx="25" ry="15" fill="#F0B0B0" opacity="0.12" filter="url(#blushFilter)"/>
+        <ellipse cx="340" cy="275" rx="25" ry="15" fill="#F0B0B0" opacity="0.12" filter="url(#blushFilter)"/>
+
+        <!-- ======== LAYER 5: BANGS + HAIR FRAMING ======== -->
+
+        <!-- Bangs -->
+        <path d="M110 110
+                 Q120 50 180 35
+                 Q215 28 250 28
+                 Q285 28 320 35
+                 Q380 50 390 110
+                 L385 160
+                 Q370 178 350 170
+                 Q330 165 310 175
+                 Q290 185 270 178
+                 Q255 170 250 172
+                 Q245 170 230 178
+                 Q210 185 190 175
+                 Q170 165 150 170
+                 Q130 178 115 160
+                 Z"
+              fill="url(#hair)"/>
+
+        <!-- Strand separation lines -->
+        <path d="M180 40 L175 175" stroke="#18182A" stroke-width="1" opacity="0.2"/>
+        <path d="M215 32 L210 180" stroke="#18182A" stroke-width="1" opacity="0.18"/>
+        <path d="M250 28 L250 172" stroke="#18182A" stroke-width="1" opacity="0.2"/>
+        <path d="M285 32 L290 180" stroke="#18182A" stroke-width="1" opacity="0.18"/>
+        <path d="M320 40 L325 175" stroke="#18182A" stroke-width="1" opacity="0.2"/>
+
+        <!-- Additional fine strands -->
+        <path d="M198 35 L195 178" stroke="#18182A" stroke-width="0.5" opacity="0.12"/>
+        <path d="M233 30 L230 176" stroke="#18182A" stroke-width="0.5" opacity="0.12"/>
+        <path d="M267 30 L270 176" stroke="#18182A" stroke-width="0.5" opacity="0.12"/>
+        <path d="M302 35 L305 178" stroke="#18182A" stroke-width="0.5" opacity="0.12"/>
+
+        <!-- Bangs highlight sheen -->
+        <path d="M190 60 Q220 50 250 55 Q280 50 310 60"
+              stroke="#5A6A90" stroke-width="4" fill="none" opacity="0.1"/>
+        <path d="M200 80 Q225 72 250 75 Q275 72 300 80"
+              stroke="#5A6A90" stroke-width="2" fill="none" opacity="0.08"/>
+
+        <!-- Hair framing strands - left -->
+        <path d="M115 160 Q95 250 80 350 Q70 400 65 425
+                 L100 425 Q110 375 120 325 Q130 250 135 170 Z"
+              fill="url(#hair)"/>
+        <!-- Hair framing strands - right -->
+        <path d="M385 160 Q405 250 420 350 Q430 400 435 425
+                 L400 425 Q390 375 380 325 Q370 250 365 170 Z"
+              fill="url(#hair)"/>
+
+        <!-- Hair falling forward over shoulders - left -->
+        <path d="M120 275 Q140 350 160 410 Q165 440 175 460
+                 L150 460 Q135 425 120 360 Q110 310 110 275 Z"
+              fill="url(#hair)"/>
+        <!-- Hair falling forward over shoulders - right -->
+        <path d="M380 275 Q360 350 340 410 Q335 440 325 460
+                 L350 460 Q365 425 380 360 Q390 310 390 275 Z"
+              fill="url(#hair)"/>
+
+        <!-- Hair shine streaks -->
+        <path d="M80 225 Q70 300 60 375"
+              stroke="#5A6A90" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.1"/>
+        <path d="M90 240 Q82 310 75 380"
+              stroke="#5A6A90" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.06"/>
+        <path d="M420 225 Q430 300 440 375"
+              stroke="#5A6A90" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.08"/>
+        <path d="M410 240 Q418 310 425 380"
+              stroke="#5A6A90" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.06"/>
+
+      </g>
+
+      <!-- Border ring -->
+      <circle cx="250" cy="250" r="244" fill="none" stroke="#E0DCD6" stroke-width="2"/>
+    </svg>
+  </div>
+</div>
+</body>
+</html>

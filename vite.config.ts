@@ -137,4 +137,7 @@ function apiProxy(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), apiProxy()],
+  build: {
+    sourcemap: false,
+  },
 })

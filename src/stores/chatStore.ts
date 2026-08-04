@@ -57,38 +57,32 @@ const DEFAULT_GREETING: Message = {
   quickReplies: ['Show me what you can do', 'How does this work?', 'I want to hire Nate'],
 }
 
-function buildReturnGreeting(leadProfile: LeadProfile, stage: ConversationStage): Message {
+const RETURN_GREETINGS_WITH_NAME = [
+  (name: string) => `${name}?? Oh thank god, you're back. I thought I said something wrong. Everything okay?`,
+  (name: string) => `${name}! You just disappeared on me. I was literally mid-thought. Where'd you go?`,
+  (name: string) => `Oh, ${name}, hey! I was starting to worry. Did something come up or did I bore you? Be honest.`,
+]
+
+const RETURN_GREETINGS_ANONYMOUS = [
+  "Hey, you're back! You disappeared on me mid-conversation. Everything alright?",
+  "Oh good, you came back. I was starting to think I scared you off. Where'd you go?",
+  "Wait, hi again! You just vanished. I was worried I said something weird. You okay?",
+]
+
+function buildReturnGreeting(leadProfile: LeadProfile): Message {
   const name = leadProfile.name
-  const painPoint = leadProfile.painPoints.length > 0 ? leadProfile.painPoints[0] : null
+  const idx = Math.floor(Math.random() * 3)
 
-  let content: string
-  let quickReplies: string[]
-
-  if (stage === 'booked') {
-    content = name
-      ? `Hey ${name}! You've already got a call booked. Need anything else?`
-      : "Welcome back! You've got a call booked. Need anything else?"
-    quickReplies = ['Just browsing', 'Have a new question', 'Start fresh']
-  } else if (name && painPoint) {
-    content = `Hey ${name}! Welcome back. Still thinking about that ${painPoint} challenge?`
-    quickReplies = ['Pick up where we left off', 'Start fresh', 'Book a call']
-  } else if (name) {
-    content = `Hey ${name}! Good to see you again. How can I help?`
-    quickReplies = ['Pick up where we left off', 'Start fresh', 'Book a call']
-  } else if (painPoint) {
-    content = `Welcome back! We were chatting about ${painPoint} last time. Want to continue?`
-    quickReplies = ['Pick up where we left off', 'Start fresh', 'Book a call']
-  } else {
-    content = "Welcome back! Want to pick up where we left off?"
-    quickReplies = ['Continue', 'Start fresh', 'Book a call']
-  }
+  const content = name
+    ? RETURN_GREETINGS_WITH_NAME[idx](name)
+    : RETURN_GREETINGS_ANONYMOUS[idx]
 
   return {
     id: 'greeting',
     role: 'agent',
     content,
     timestamp: Date.now(),
-    quickReplies,
+    quickReplies: ['Sorry, got distracted!', 'Just looking around', 'I want to hire Nate'],
   }
 }
 
@@ -198,11 +192,20 @@ export const useChatStore = create<ChatState>()(
       onRehydrateStorage: () => {
         return (state) => {
           if (!state) return
-          const { leadProfile, stage, messages } = state
+          const { leadProfile, messages } = state
           const hasRealConversation = messages.length > 1
           if (hasRealConversation) {
-            const returnGreeting = buildReturnGreeting(leadProfile, stage)
-            state.messages = [returnGreeting, ...messages.filter((m) => m.id !== 'greeting')]
+            // Reset the chat but greet them like a human who noticed they left
+            const returnGreeting = buildReturnGreeting(leadProfile)
+            state.messages = [returnGreeting]
+            state.leadProfile = { ...initialProfile }
+            state.score = { ...initialScore }
+            state.stage = 'greeting'
+            state.sentimentHistory = []
+            state.enrichment = null
+            state.enrichmentLoading = false
+            state.conversationStartTime = null
+            state.qualificationProgress = { current: 0, total: 6 }
           }
         }
       },

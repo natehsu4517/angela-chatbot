@@ -26,15 +26,12 @@ export default function App() {
       <main className="max-w-6xl mx-auto px-6 py-10">
         {/* Hero */}
         <div className="mb-12 md:mb-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-sans leading-[1.05] mb-4 max-w-2xl">
-            Your 24/7 Lead{' '}
-            <br className="hidden md:block" />
-            Qualification Agent
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-sans leading-[1.05] mb-4">
+            She Qualifies Your Leads While You Sleep
           </h2>
-          <p className="text-lg md:text-xl text-text-muted max-w-xl mb-8">
-            Angela talks to your website visitors, qualifies them in real-time,
-            and books meetings on your calendar. No forms. No friction.
-            No $2,500/mo SaaS subscription.
+          <p className="text-lg md:text-xl text-text-muted mb-8">
+            Angela is an AI agent that has real conversations with your website visitors, figures out who's serious,
+            and books meetings with qualified prospects on your calendar. Built from scratch, not a SaaS widget.
           </p>
           <motion.div
             className="flex items-center gap-2 text-sm text-text-muted"
@@ -112,7 +109,7 @@ export default function App() {
                   'Visual qualification UI with budget sliders and timeline pickers',
                   'Google Calendar integration with automatic Meet links',
                   'Conversation summary delivered before each call',
-                  'Works on any website with a single script tag',
+                  'Full admin panel with lead history and conversation logs',
                 ]}
               />
             </div>

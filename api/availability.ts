@@ -1,5 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { getCalendar, getCalendarId } from './_lib/google.js'
+import {
+  checkOrigin,
+  handlePreflight,
+  rateLimit,
+  setSecurityHeaders,
+} from './_lib/security.js'
 
 const BIZ_START = 9
 const BIZ_END = 17
@@ -7,6 +13,11 @@ const SLOT_MINUTES = 30
 const TZ = 'America/New_York'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setSecurityHeaders(res)
+  if (handlePreflight(req, res)) return
+  if (!checkOrigin(req, res)) return
+  if (!rateLimit(req, res, { maxRequests: 30, windowMs: 60_000 })) return
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
@@ -90,7 +101,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30')
     return res.json({ slots })
-  } catch (err: any) {
+  } catch (err) {
     console.error('Availability error:', err)
     return res.status(500).json({ error: 'Failed to fetch availability' })
   }
